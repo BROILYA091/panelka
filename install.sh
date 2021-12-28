@@ -56,7 +56,7 @@ BLUE=$(tput setaf 4)
 MAGENTA=$(tput setaf 5)
 LIME_YELLOW=$(tput setaf 190)
 CYAN=$(tput setaf 6)
-VER=`Debian9`
+
 OS=$(lsb_release -s -i -c -r | xargs echo |sed 's; ;-;g' | grep Ubuntu)
 IP_SERV=$(echo "${SSH_CONNECTION}" | awk '{print $3}')
 
@@ -226,7 +226,7 @@ install_location()
 		echo "phpmyadmin phpmyadmin/mysql/app-pass password $MYPASS" |debconf-set-selections > /dev/null 2>&1
 		echo "phpmyadmin phpmyadmin/app-password-confirm password $MYPASS" | debconf-set-selections > /dev/null 2>&1
 		echo 'phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2' | debconf-set-selections > /dev/null 2>&1
-		apt-get install -y phpmyadmin > 
+		apt-get install -y phpmyadmin
 		 
 		log_n "${BLUE}Setting Apache2 and MariaDB"
 		cd /etc/apache2/sites-available/
