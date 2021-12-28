@@ -226,7 +226,7 @@ install_location()
 		echo "phpmyadmin phpmyadmin/mysql/app-pass password $MYPASS" |debconf-set-selections > /dev/null 2>&1
 		echo "phpmyadmin phpmyadmin/app-password-confirm password $MYPASS" | debconf-set-selections > /dev/null 2>&1
 		echo 'phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2' | debconf-set-selections > /dev/null 2>&1
-		apt-get install -y phpmyadmin > /dev/null 2>&1
+		apt-get install -y phpmyadmin > 
 		 
 		log_n "${BLUE}Setting Apache2 and MariaDB"
 		cd /etc/apache2/sites-available/
