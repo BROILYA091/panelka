@@ -72,38 +72,17 @@ install_panel()
 		echo "deb-src http://security.debian.org/debian-security stretch/updates main" >> /etc/apt/sources.list
 		echo "deb http://deb.debian.org/debian stretch-updates main" >> /etc/apt/sources.list
 		echo "deb-src http://deb.debian.org/debian stretch-updates main" >> /etc/apt/sources.list
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Updating packages"
 		apt-get update > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Instaling Packages"
 		apt install -y pwgen apache2 php7.0 php7.0-gd php7.0-mysql php7.0-ssh2 mariadb-server unzip htop sudo curl > /dev/null 2>&1
 		MYPASS=$(pwgen -cns -1 16) > /dev/null 2>&1
 		CRONTOKE=$(pwgen -cns -1 14) > /dev/null 2>&1
 		mysql -e "GRANT ALL ON *.* TO 'admin'@'localhost' IDENTIFIED BY '$MYPASS' WITH GRANT OPTION" > /dev/null 2>&1
 		mysql -e "FLUSH PRIVILEGES" > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Instaling PhpMyAdmin"
 		echo "phpmyadmin phpmyadmin/dbconfig-install boolean true" | debconf-set-selections > /dev/null 2>&1
 		echo "phpmyadmin phpmyadmin/mysql/admin-user string admin" | debconf-set-selections > /dev/null 2>&1
@@ -112,14 +91,7 @@ install_panel()
 		echo "phpmyadmin phpmyadmin/app-password-confirm password $MYPASS" | debconf-set-selections > /dev/null 2>&1
 		echo 'phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2' | debconf-set-selections > /dev/null 2>&1
 		apt-get install -y phpmyadmin > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Setting Apache2 and MariaDB"
 		cd /etc/apache2/sites-available/
 		touch panel.conf
@@ -148,14 +120,7 @@ install_panel()
 		sed -i 's/#max_connections        = 100/max_connections        = 1000/g' /etc/mysql/mariadb.conf.d/50-server.cnf > /dev/null 2>&1
 		service apache2 restart > /dev/null 2>&1
 		service mysql restart > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Setting Cronrab"
 		(crontab -l ; echo "0 0 * * * curl http://$DOMAIN/main/cron/index?token=$CRONTOKE") 2>&1 | grep -v "no crontab" | sort | uniq | crontab -
 		(crontab -l ; echo "*/1 * * * * curl http://$DOMAIN/main/cron/gameServers?token=$CRONTOKE") 2>&1 | grep -v "no crontab" | sort | uniq | crontab -
@@ -167,63 +132,28 @@ install_panel()
 		(crontab -l ; echo "* */1 * * * curl http://$DOMAIN/main/cron/updateStatsLocations?token=$CRONTOKE") 2>&1 | grep -v "no crontab" | sort | uniq | crontab -
 		(crontab -l ; echo "0 * */7 * * curl http://$DOMAIN/main/cron/clearLogs?token=$CRONTOKE") 2>&1 | grep -v "no crontab" | sort | uniq | crontab -
 		service cron restart > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Download Panel"
 		cd / > /dev/null 2>&1
 		wget https://vipadmin.club/KJ2398D/hostinpl5_6/hostinpl56.zip > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Unpacking Panel"
 		unzip hostinpl56.zip -d /var/www/ > /dev/null 2>&1
 		rm hostinpl56.zip > /dev/null 2>&1
 		cd > /dev/null 2>&1
 		rm -Rfv /var/www/html > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Setting Config"
 		sed -i "s/parol/${MYPASS}/g" /var/www/application/config.php
 		sed -i "s/domen.ru/${DOMAIN}/g" /var/www/application/config.php
 		sed -i "s/xtwcklwhw222a/${CRONTOKE}/g" /var/www/application/config.php
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Creating and Upload Database"
 		mkdir /var/lib/mysql/hostin > /dev/null 2>&1
 		chown -R mysql:mysql /var/lib/mysql/hostin > /dev/null 2>&1
 		mysql hostin < /var/www/hostinpl.sql > /dev/null 2>&1
 		rm -rf /var/www/hostinpl.sql > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Issuing rights"
 		chown -R www-data:www-data /var/www
 		chmod -R 770 /var/www
@@ -231,14 +161,7 @@ install_panel()
 		chmod 777 /var/www/tmp/avatar
 		chmod 777 /var/www/tmp/mods
 		chmod 777 /var/www/tmp/tickets_img
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "================== Установка HOSTINPL 5.6 успешно завершена =================="
 		Error_n "${green}Адрес: ${white}http://$DOMAIN"
 		Error_n "${green}Адрес phpmyadmin: ${white}http://$DOMAIN/phpmyadmin"
@@ -285,38 +208,17 @@ install_location()
 		echo "deb-src http://security.debian.org/debian-security stretch/updates main" >> /etc/apt/sources.list
 		echo "deb http://deb.debian.org/debian stretch-updates main" >> /etc/apt/sources.list
 		echo "deb-src http://deb.debian.org/debian stretch-updates main" >> /etc/apt/sources.list
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		groupadd gameservers > /dev/null 2>&1
 		log_n "${BLUE}Updating packages"
 		apt-get update > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Instaling packages"
 		apt-get install -y curl pwgen sudo unzip openssh-server apache2 php7.0 mariadb-server > /dev/null 2>&1
 		MYPASS=$(pwgen -cns -1 16) > /dev/null 2>&1
 		mysql -e "GRANT ALL ON *.* TO 'admin'@'localhost' IDENTIFIED BY '$MYPASS' WITH GRANT OPTION" > /dev/null 2>&1
 		mysql -e "FLUSH PRIVILEGES" > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Instaling PhpMyAdmin"
 		echo "phpmyadmin phpmyadmin/dbconfig-install boolean true" | debconf-set-selections > /dev/null 2>&1
 		echo "phpmyadmin phpmyadmin/mysql/admin-user string admin" | debconf-set-selections > /dev/null 2>&1
@@ -325,14 +227,7 @@ install_location()
 		echo "phpmyadmin phpmyadmin/app-password-confirm password $MYPASS" | debconf-set-selections > /dev/null 2>&1
 		echo 'phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2' | debconf-set-selections > /dev/null 2>&1
 		apt-get install -y phpmyadmin > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Setting Apache2 and MariaDB"
 		cd /etc/apache2/sites-available/
 		touch phpmyadmin.conf
@@ -361,127 +256,50 @@ install_location()
 		sed -i 's/#max_connections        = 100/max_connections        = 1000/g' /etc/mysql/mariadb.conf.d/50-server.cnf > /dev/null 2>&1
 		service apache2 restart > /dev/null 2>&1
 		service mysql restart > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Create folder"
 		mkdir /home/cp > /dev/null 2>&1
 		mkdir /home/cp/backups > /dev/null 2>&1
 		mkdir /home/cp/gameservers > /dev/null 2>&1
 		mkdir /home/cp/gameservers/files > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Issuing rights"
 		cd > /dev/null 2>&1
 		chown -R root /home/ > /dev/null 2>&1
 		chmod -R 755 /home/ > /dev/null 2>&1
 		chmod 700 /home/cp/backups > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		echo "Europe/Moscow" > /etc/timezone > /dev/null 2>&1
 		log_n "${BLUE}Setting SSH"
 		sudo sh -c "echo '' >> /etc/ssh/sshd_config" > /dev/null 2>&1
 		sudo sh -c "echo 'DenyGroups gameservers' >> /etc/ssh/sshd_config" > /dev/null 2>&1
 		service ssh restart > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Instaling FTP Service"
 		apt-get install -y proftpd > /dev/null 2>&1
 		sudo sh -c "echo 'DefaultRoot ~' >> /etc/proftpd/proftpd.conf" > /dev/null 2>&1
 		sudo sh -c "echo 'RequireValidShell off' >> /etc/proftpd/proftpd.conf" > /dev/null 2>&1
 		service proftpd restart > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Instaling HTOP"
 		apt-get install -y htop > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Instaling Docker"
 		log_n "${white}Step: 1/5"
 		apt-get install -y apt-transport-https ca-certificates > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${white}Step: 2/5"
 		curl -fsSL "https://download.docker.com/linux/debian/gpg" | apt-key add > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${white}Step: 3/5"
 		echo "deb [arch=amd64] https://download.docker.com/linux/debian stretch stable" > /etc/apt/sources.list.d/docker.list
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${white}Step: 4/5"
 		apt-get update > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${white}Step: 5/5"
 		apt-get install -y docker-ce > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		log_n "${BLUE}Setting Docker"
 		cd /etc > /dev/null 2>&1
 		mkdir images > /dev/null 2>&1
@@ -490,14 +308,7 @@ install_location()
 		docker build -t debian:stretch . > /dev/null 2>&1
 		cd > /dev/null 2>&1
 		rm -rf /etc/images > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			echo "${green}[SUCCESS]"
-			tput sgr0
-		else
-			echo "${red}[ERROR]"
-			tput sgr0
-			exit
-		fi
+		 
 		apt-get install -y lib32stdc++6 > /dev/null 2>&1
 		cd /root > /dev/null 2>&1
 		mkdir steamcmd > /dev/null 2>&1
